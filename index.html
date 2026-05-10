@@ -25,7 +25,7 @@ function envoyer() {
   localStorage.setItem("nom", nom);
   localStorage.setItem("prenom", prenom);
 
-  fetch("URL_APPS_SCRIPT", {
+  fetch("https://script.google.com/macros/s/AKfycbxAiJRkt71qihKiNTi1kaG3kXcaGtx8liUGMbisUFy2BuIBfH82lxmzXMDHsAAtwBcg/exec", {
     method: "POST",
     body: JSON.stringify({
       nom: nom,
