@@ -3,88 +3,134 @@
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Présence Club</title>
+  <title>Présence Club</title>
 
-<style>
+  <style>
 
-body{
-  font-family: Arial, sans-serif;
-  background:#f2f4f8;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  margin:0;
-}
+    body{
+      margin:0;
+      padding:0;
 
-.card{
+      font-family:Arial, sans-serif;
 
-  background:white;
-  padding:30px;
-  border-radius:20px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+      background:#f2f4f8;
 
-  width:320px;
-  text-align:center;
-}
+      display:flex;
+      justify-content:center;
+      align-items:center;
 
-.logo{
-  width:120px;
-  margin-bottom:15px;
-}
+      min-height:100vh;
+    }
 
-h1{
-  margin-top:0;
-  color:#222;
-}
+    .card{
 
-input{
+      width:340px;
 
-  width:100%;
-  padding:14px;
-  margin-top:10px;
+      background:white;
 
-  border-radius:10px;
-  border:1px solid #ccc;
+      border-radius:24px;
 
-  font-size:16px;
-  box-sizing:border-box;
-}
+      padding:30px;
 
-button{
+      box-shadow:0 6px 20px rgba(0,0,0,0.12);
 
-  width:100%;
-  margin-top:20px;
+      text-align:center;
+    }
 
-  padding:16px;
+    .logo{
+      width:120px;
+      margin-bottom:10px;
+    }
 
-  border:none;
-  border-radius:12px;
+    h1{
+      margin-top:0;
+      margin-bottom:10px;
+      color:#222;
+    }
 
-  background:#2563eb;
-  color:white;
+    .welcome{
+      color:#666;
+      margin-bottom:25px;
+    }
 
-  font-size:18px;
-  font-weight:bold;
+    .card-seance{
 
-  cursor:pointer;
-}
+      background:#ffffff;
 
-button:hover{
-  opacity:0.9;
-}
+      border-radius:16px;
 
-.success{
+      padding:18px;
 
-  margin-top:15px;
-  color:green;
-  font-weight:bold;
-}
+      margin-top:15px;
 
-</style>
+      border:2px solid #e5e7eb;
+
+      cursor:pointer;
+
+      transition:0.2s;
+    }
+
+    .card-seance:hover{
+      transform:scale(1.02);
+    }
+
+    .card-seance.selected{
+      border:2px solid #2563eb;
+      background:#eff6ff;
+    }
+
+    .cours{
+      font-size:22px;
+      font-weight:bold;
+      color:#111827;
+    }
+
+    .heure{
+      margin-top:8px;
+      color:#6b7280;
+      font-size:16px;
+    }
+
+    button{
+
+      width:100%;
+
+      margin-top:25px;
+
+      padding:16px;
+
+      border:none;
+
+      border-radius:14px;
+
+      background:#2563eb;
+
+      color:white;
+
+      font-size:18px;
+
+      font-weight:bold;
+
+      cursor:pointer;
+    }
+
+    button:hover{
+      opacity:0.95;
+    }
+
+    .message{
+
+      margin-top:20px;
+
+      font-weight:bold;
+
+      color:green;
+    }
+
+  </style>
 
 </head>
 
@@ -92,70 +138,239 @@ button:hover{
 
 <div class="card">
 
-  <img src="1000078005.jpg" class="logo">
+  <!-- LOGO -->
+  <img src="logo.png" class="logo">
 
   <h1>Club Sportif</h1>
 
-  <input id="nom" placeholder="Nom">
+  <div class="welcome" id="welcome">
+    Bienvenue 👋
+  </div>
 
-  <input id="prenom" placeholder="Prénom">
+  <!-- LISTE DES SEANCES -->
+  <div id="listeSeances">
 
-  <button onclick="envoyer()">
+    Chargement des séances...
+
+  </div>
+
+  <!-- BOUTON -->
+  <button onclick="validerPresence()">
     Je suis présent
   </button>
 
-  <div id="message" class="success"></div>
+  <!-- MESSAGE -->
+  <div id="message" class="message"></div>
 
 </div>
 
 <script>
 
-document.getElementById("nom").value =
- localStorage.getItem("nom") || "";
+  // =========================
+  // CONFIG
+  // =========================
 
-document.getElementById("prenom").value =
- localStorage.getItem("prenom") || "";
+  const API_URL =
+    "VOTRE_URL_APPS_SCRIPT";
 
-function envoyer(){
+  // =========================
+  // VARIABLES
+  // =========================
 
   let nom =
-   document.getElementById("nom").value;
+    localStorage.getItem("nom");
 
   let prenom =
-   document.getElementById("prenom").value;
+    localStorage.getItem("prenom");
 
-  localStorage.setItem("nom", nom);
-  localStorage.setItem("prenom", prenom);
+  let seanceChoisie = "";
 
-  fetch("https://script.google.com/macros/s/AKfycbxAiJRkt71qihKiNTi1kaG3kXcaGtx8liUGMbisUFy2BuIBfH82lxmzXMDHsAAtwBcg/exec", {
+  // =========================
+  // PREMIERE UTILISATION
+  // =========================
 
-    method:"POST",
+  if(!nom){
 
-    body:JSON.stringify({
-      nom:nom,
-      prenom:prenom
+    nom =
+      prompt("Votre nom");
+
+    localStorage.setItem("nom", nom);
+  }
+
+  if(!prenom){
+
+    prenom =
+      prompt("Votre prénom");
+
+    localStorage.setItem("prenom", prenom);
+  }
+
+  // =========================
+  // MESSAGE BIENVENUE
+  // =========================
+
+  document
+    .getElementById("welcome")
+    .innerHTML =
+      "Bienvenue " + prenom + " 👋";
+
+  // =========================
+  // CHARGEMENT SEANCES
+  // =========================
+
+  chargerSeances();
+
+  function chargerSeances(){
+
+    fetch("https://script.google.com/macros/s/AKfycbyq69R-VfA30THQLwA9QUOROD-Edk2yBjPGsUZHv2uFV5fJg8hrBmyhLPWWo0rTuGqW/exec")
+
+    .then(r => r.json())
+
+    .then(data => {
+
+      afficherSeances(data);
+
     })
 
-  })
-  .then(() => {
+    .catch(() => {
 
-    document.getElementById("message")
-      .innerHTML =
-      "✓ Présence enregistrée";
+      document
+        .getElementById("listeSeances")
+        .innerHTML =
+          "Erreur chargement séances";
 
-  })
-  .catch(() => {
+    });
+  }
 
-    document.getElementById("message")
-      .innerHTML =
-      "Erreur";
+  // =========================
+  // AFFICHAGE SEANCES
+  // =========================
 
-  });
+  function afficherSeances(seances){
 
-}
+    let html = "";
+
+    if(seances.length == 0){
+
+      html =
+        "<p>Aucune séance aujourd'hui</p>";
+    }
+
+    seances.forEach((s,index) => {
+
+      html += `
+
+        <div
+          class="card-seance"
+          id="seance-${index}"
+          onclick="
+            selectionnerSeance(
+              '${s.cours}',
+              '${s.heure}',
+              ${index}
+            )
+          "
+        >
+
+          <div class="cours">
+            ${s.cours}
+          </div>
+
+          <div class="heure">
+            Début : ${s.heure}
+          </div>
+
+        </div>
+
+      `;
+    });
+
+    document
+      .getElementById("listeSeances")
+      .innerHTML = html;
+  }
+
+  // =========================
+  // SELECTION SEANCE
+  // =========================
+
+  function selectionnerSeance(
+    cours,
+    heure,
+    index
+  ){
+
+    seanceChoisie =
+      cours + " - " + heure;
+
+    // retire sélection précédente
+
+    document
+      .querySelectorAll(".card-seance")
+      .forEach(c => {
+
+        c.classList.remove("selected");
+
+      });
+
+    // ajoute sélection
+
+    document
+      .getElementById("seance-" + index)
+      .classList.add("selected");
+  }
+
+  // =========================
+  // VALIDATION PRESENCE
+  // =========================
+
+  function validerPresence(){
+
+    if(seanceChoisie == ""){
+
+      alert(
+        "Veuillez sélectionner une séance"
+      );
+
+      return;
+    }
+
+    fetch("https://script.google.com/macros/s/AKfycbyq69R-VfA30THQLwA9QUOROD-Edk2yBjPGsUZHv2uFV5fJg8hrBmyhLPWWo0rTuGqW/exec", {
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        nom:nom,
+        prenom:prenom,
+        seance:seanceChoisie
+
+      })
+
+    })
+
+    .then(r => r.text())
+
+    .then(() => {
+
+      document
+        .getElementById("message")
+        .innerHTML =
+          "✓ Présence enregistrée";
+
+    })
+
+    .catch(() => {
+
+      document
+        .getElementById("message")
+        .innerHTML =
+          "Erreur envoi";
+
+    });
+  }
 
 </script>
 
 </body>
 </html>
-
