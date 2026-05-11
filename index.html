@@ -171,7 +171,7 @@
   // =========================
 
   const API_URL =
-    "VOTRE_URL_APPS_SCRIPT";
+    "https://script.google.com/macros/s/AKfycbyq69R-VfA30THQLwA9QUOROD-Edk2yBjPGsUZHv2uFV5fJg8hrBmyhLPWWo0rTuGqW/exec";
 
   // =========================
   // VARIABLES
@@ -197,13 +197,14 @@
     localStorage.setItem("nom", nom);
   }
 
-  if(!prenom){
+  if(!prenom || prenom == "null"){
 
     prenom =
       prompt("Votre prénom");
 
     localStorage.setItem("prenom", prenom);
   }
+  
 
   // =========================
   // MESSAGE BIENVENUE
@@ -222,12 +223,12 @@
 
   function chargerSeances(){
 
-    fetch("https://script.google.com/macros/s/AKfycbyq69R-VfA30THQLwA9QUOROD-Edk2yBjPGsUZHv2uFV5fJg8hrBmyhLPWWo0rTuGqW/exec")
+    fetch(API_URL)
 
     .then(r => r.json())
 
     .then(data => {
-
+console.log(data);
       afficherSeances(data);
 
     })
@@ -335,7 +336,7 @@
       return;
     }
 
-    fetch("https://script.google.com/macros/s/AKfycbyq69R-VfA30THQLwA9QUOROD-Edk2yBjPGsUZHv2uFV5fJg8hrBmyhLPWWo0rTuGqW/exec", {
+    fetch(API_URL, {
 
       method:"POST",
 
