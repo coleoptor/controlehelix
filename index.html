@@ -162,6 +162,9 @@
   <!-- MESSAGE -->
   <div id="message" class="message"></div>
 
+  <button id="changerProfil">
+  Changer de profil
+  </button>
 </div>
 
 <script>
@@ -321,6 +324,17 @@
       .classList.add("selected");
   }
 
+document
+  .getElementById("changerProfil")
+  .addEventListener("click", () => {
+
+    localStorage.removeItem("nom");
+    localStorage.removeItem("prenom");
+
+    location.reload();
+});
+
+  
   // =========================
   // VALIDATION PRESENCE
   // =========================
