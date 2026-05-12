@@ -39,7 +39,18 @@
 
       text-align:center;
     }
+   .change-user{
 
+      margin-bottom:25px;
+
+      color:#2563eb;
+
+      font-size:14px;
+
+      cursor:pointer;
+
+      text-decoration:underline;
+    }
     .logo{
       width:120px;
       margin-bottom:10px;
@@ -146,7 +157,12 @@
   <div class="welcome" id="welcome">
     Bienvenue 👋
   </div>
+  <div class="change-user"
+       onclick="changerUtilisateur()">
 
+    Changer d'utilisateur
+
+  </div>
   <!-- LISTE DES SEANCES -->
   <div id="listeSeances">
 
@@ -162,9 +178,6 @@
   <!-- MESSAGE -->
   <div id="message" class="message"></div>
 
-  <button id="changerProfil">
-  Changer de profil
-  </button>
 </div>
 
 <script>
@@ -324,15 +337,26 @@
       .classList.add("selected");
   }
 
-document
-  .getElementById("changerProfil")
-  .addEventListener("click", () => {
+// =========================
+  // CHANGER UTILISATEUR
+  // =========================
+
+  function changerUtilisateur(){
 
     localStorage.removeItem("nom");
     localStorage.removeItem("prenom");
 
-    location.reload();
-});
+    nom =
+      prompt("Nouveau nom");
+
+    prenom =
+      prompt("Nouveau prénom");
+
+    localStorage.setItem("nom", nom);
+    localStorage.setItem("prenom", prenom);
+
+    mettreAJourBienvenue();
+  }
 
   
   // =========================
