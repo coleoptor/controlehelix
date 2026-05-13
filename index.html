@@ -1,413 +1,309 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Présence Club</title>
+<title>Présences Club</title>
 
-  <style>
+<style>
 
-    body{
-      margin:0;
-      padding:0;
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
 
-      font-family:Arial, sans-serif;
+.container {
+  max-width: 500px;
+  margin: auto;
+}
 
-      background:#f2f4f8;
+.logo {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-      display:flex;
-      justify-content:center;
-      align-items:center;
+.logo img {
+  width: 120px;
+}
 
-      min-height:100vh;
-    }
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
 
-    .card{
+.seance {
+  cursor: pointer;
+  transition: 0.2s;
+}
 
-      width:340px;
+.seance:hover {
+  transform: scale(1.02);
+}
 
-      background:white;
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #1f7aec;
+  color: white;
+  font-size: 16px;
+  margin-top: 10px;
+}
 
-      border-radius:24px;
+input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
 
-      padding:30px;
+.small {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  margin-top: 10px;
+}
 
-      box-shadow:0 6px 20px rgba(0,0,0,0.12);
-
-      text-align:center;
-    }
-   .change-user{
-
-      margin-bottom:25px;
-
-      color:#2563eb;
-
-      font-size:14px;
-
-      cursor:pointer;
-
-      text-decoration:underline;
-    }
-    .logo{
-      width:120px;
-      margin-bottom:10px;
-    }
-
-    h1{
-      margin-top:0;
-      margin-bottom:10px;
-      color:#222;
-    }
-
-    .welcome{
-      color:#666;
-      margin-bottom:25px;
-    }
-
-    .card-seance{
-
-      background:#ffffff;
-
-      border-radius:16px;
-
-      padding:18px;
-
-      margin-top:15px;
-
-      border:2px solid #e5e7eb;
-
-      cursor:pointer;
-
-      transition:0.2s;
-    }
-
-    .card-seance:hover{
-      transform:scale(1.02);
-    }
-
-    .card-seance.selected{
-      border:2px solid #2563eb;
-      background:#eff6ff;
-    }
-
-    .cours{
-      font-size:22px;
-      font-weight:bold;
-      color:#111827;
-    }
-
-    .heure{
-      margin-top:8px;
-      color:#6b7280;
-      font-size:16px;
-    }
-
-    button{
-
-      width:100%;
-
-      margin-top:25px;
-
-      padding:16px;
-
-      border:none;
-
-      border-radius:14px;
-
-      background:#2563eb;
-
-      color:white;
-
-      font-size:18px;
-
-      font-weight:bold;
-
-      cursor:pointer;
-    }
-
-    button:hover{
-      opacity:0.95;
-    }
-
-    .message{
-
-      margin-top:20px;
-
-      font-weight:bold;
-
-      color:green;
-    }
-
-  </style>
+</style>
 
 </head>
-
 <body>
 
-<div class="card">
+<div class="container">
 
-  <!-- LOGO -->
-  <img src="1000078005.jpg" class="logo">
+<div class="logo">
+  <img src="1000078005.jpg" alt="Logo club">
+</div>
 
-  <h1>Club Sportif</h1>
+<div id="profil"></div>
 
-  <div class="welcome" id="welcome">
-    Bienvenue 👋
-  </div>
-  <div class="change-user"
-       onclick="changerUtilisateur()">
-
-    Changer d'utilisateur
-
-  </div>
-  <!-- LISTE DES SEANCES -->
-  <div id="listeSeances">
-
-    Chargement des séances...
-
-  </div>
-
-  <!-- BOUTON -->
-  <button onclick="validerPresence()">
-    Je suis présent
-  </button>
-
-  <!-- MESSAGE -->
-  <div id="message" class="message"></div>
+<div id="seances"></div>
 
 </div>
 
 <script>
 
-  // =========================
-  // CONFIG
-  // =========================
+const API_URL = "https://script.google.com/macros/s/AKfycbyq69R-VfA30THQLwA9QUOROD-Edk2yBjPGsUZHv2uFV5fJg8hrBmyhLPWWo0rTuGqW/exec";
 
-  const API_URL =
-    "https://script.google.com/macros/s/AKfycbyq69R-VfA30THQLwA9QUOROD-Edk2yBjPGsUZHv2uFV5fJg8hrBmyhLPWWo0rTuGqW/exec";
+const jours = [
+  "Dimanche",
+  "Lundi",
+  "Mardi",
+  "Mercredi",
+  "Jeudi",
+  "Vendredi",
+  "Samedi"
+];
 
-  // =========================
-  // VARIABLES
-  // =========================
+const aujourdHui = jours[new Date().getDay()];
 
-  let nom =
-    localStorage.getItem("nom");
+let nom = localStorage.getItem("club_nom");
+let prenom = localStorage.getItem("club_prenom");
 
-  let prenom =
-    localStorage.getItem("prenom");
+const profilDiv = document.getElementById("profil");
+const seancesDiv = document.getElementById("seances");
 
-  let seanceChoisie = "";
+initialiser();
 
-  // =========================
-  // PREMIERE UTILISATION
-  // =========================
+async function initialiser() {
 
-  if(!nom){
+  if (!nom || !prenom) {
 
-    nom =
-      prompt("Votre nom");
+    afficherFormulaire();
 
-    localStorage.setItem("nom", nom);
+  } else {
+
+    afficherBienvenue();
+
+    chargerDepuisCache();
+
+    chargerDepuisAPI();
+  }
+}
+
+function afficherFormulaire() {
+
+  profilDiv.innerHTML = `
+
+    <div class="card">
+
+      <h2>Bienvenue 👋</h2>
+
+      <input type="text" id="prenom" placeholder="Prénom">
+
+      <input type="text" id="nom" placeholder="Nom">
+
+      <button onclick="sauvegarderProfil()">
+        Continuer
+      </button>
+
+    </div>
+  `;
+}
+
+function sauvegarderProfil() {
+
+  const prenomInput = document.getElementById("prenom").value.trim();
+  const nomInput = document.getElementById("nom").value.trim();
+
+  if (!prenomInput || !nomInput) {
+    alert("Veuillez remplir les champs");
+    return;
   }
 
-  if(!prenom || prenom == "null"){
+  localStorage.setItem("club_prenom", prenomInput);
+  localStorage.setItem("club_nom", nomInput);
 
-    prenom =
-      prompt("Votre prénom");
+  location.reload();
+}
 
-    localStorage.setItem("prenom", prenom);
+function afficherBienvenue() {
+
+  profilDiv.innerHTML = `
+
+    <div class="card">
+
+      <h2>Bienvenue ${prenom} 👋</h2>
+
+      <button onclick="changerProfil()">
+        Changer de profil
+      </button>
+
+    </div>
+  `;
+}
+
+function changerProfil() {
+
+  localStorage.removeItem("club_nom");
+  localStorage.removeItem("club_prenom");
+
+  location.reload();
+}
+
+function chargerDepuisCache() {
+
+  const cache = localStorage.getItem("club_planning_hebdo");
+
+  if (!cache) return;
+
+  const data = JSON.parse(cache);
+
+  afficherSeances(data);
+}
+
+async function chargerDepuisAPI() {
+
+  try {
+
+    const response = await fetch(API_URL);
+
+    const data = await response.json();
+
+    localStorage.setItem(
+      "club_planning_hebdo",
+      JSON.stringify(data)
+    );
+
+    afficherSeances(data);
+
+  } catch (e) {
+
+    console.error(e);
   }
-  
+}
 
-  // =========================
-  // MESSAGE BIENVENUE
-  // =========================
+function afficherSeances(data) {
 
-  document
-    .getElementById("welcome")
-    .innerHTML =
-      "Bienvenue " + prenom + " 👋";
+  const seancesDuJour = data.filter(
+    s => s.jour === aujourdHui
+  );
 
-  // =========================
-  // CHARGEMENT SEANCES
-  // =========================
+  if (seancesDuJour.length === 0) {
 
-  chargerSeances();
+    seancesDiv.innerHTML = `
+      <div class="card">
+        Aucune séance aujourd'hui
+      </div>
+    `;
 
-  function chargerSeances(){
+    return;
+  }
 
-    fetch(API_URL)
+  seancesDiv.innerHTML = "";
 
-    .then(r => r.json())
+  seancesDuJour.forEach(seance => {
 
-    .then(data => {
+    const card = document.createElement("div");
 
-      afficherSeances(data);
+    card.className = "card seance";
 
-    })
+    card.innerHTML = `
 
-    .catch(() => {
+      <h3>${seance.cours}</h3>
 
-      document
-        .getElementById("listeSeances")
-        .innerHTML =
-          "Erreur chargement séances";
+      <p>${seance.heure}</p>
 
+      <button>
+        Je suis présent
+      </button>
+    `;
+
+    card.querySelector("button")
+      .addEventListener("click", () => {
+
+        enregistrerPresence(seance);
     });
-  }
 
-  // =========================
-  // AFFICHAGE SEANCES
-  // =========================
+    seancesDiv.appendChild(card);
+  });
+}
 
-  function afficherSeances(seances){
+async function enregistrerPresence(seance) {
 
-    let html = "";
+  const seanceTexte =
+    `${seance.cours} - ${seance.heure}`;
 
-    if(seances.length == 0){
+  try {
 
-      html =
-        "<p>Aucune séance aujourd'hui</p>";
-    }
+    const response = await fetch(API_URL, {
 
-    seances.forEach((s,index) => {
+      method: "POST",
 
-      html += `
+      body: JSON.stringify({
 
-        <div
-          class="card-seance"
-          id="seance-${index}"
-          onclick="
-            selectionnerSeance(
-              '${s.cours}',
-              '${s.heure}',
-              ${index}
-            )
-          "
-        >
-
-          <div class="cours">
-            ${s.cours}
-          </div>
-
-          <div class="heure">
-             ${s.heure}
-          </div>
-
-        </div>
-
-      `;
-    });
-
-    document
-      .getElementById("listeSeances")
-      .innerHTML = html;
-  }
-
-  // =========================
-  // SELECTION SEANCE
-  // =========================
-
-  function selectionnerSeance(
-    cours,
-    heure,
-    index
-  ){
-
-    seanceChoisie =
-      cours + " - " + heure;
-
-    // retire sélection précédente
-
-    document
-      .querySelectorAll(".card-seance")
-      .forEach(c => {
-
-        c.classList.remove("selected");
-
-      });
-
-    // ajoute sélection
-
-    document
-      .getElementById("seance-" + index)
-      .classList.add("selected");
-  }
-
-// =========================
-  // CHANGER UTILISATEUR
-  // =========================
-
-  function changerUtilisateur(){
-
-    localStorage.removeItem("nom");
-    localStorage.removeItem("prenom");
-
-    nom =
-      prompt("Nouveau nom");
-
-    prenom =
-      prompt("Nouveau prénom");
-
-    localStorage.setItem("nom", nom);
-    localStorage.setItem("prenom", prenom);
-
-    mettreAJourBienvenue();
-  }
-
-  
-  // =========================
-  // VALIDATION PRESENCE
-  // =========================
-
-  function validerPresence(){
-
-    if(seanceChoisie == ""){
-
-      alert(
-        "Veuillez sélectionner une séance"
-      );
-
-      return;
-    }
-
-    fetch(API_URL, {
-
-      method:"POST",
-
-      body:JSON.stringify({
-
-        nom:nom,
-        prenom:prenom,
-        cours:seanceChoisie
-
+        nom: nom,
+        prenom: prenom,
+        cours: seanceTexte
       })
-
-    })
-
-    .then(r => r.text())
-
-    .then(() => {
-
-      document
-        .getElementById("message")
-        .innerHTML =
-          "✓ Présence enregistrée";
-
-    })
-
-    .catch(() => {
-
-      document
-        .getElementById("message")
-        .innerHTML =
-          "Erreur envoi";
-
     });
+
+    const result = await response.json();
+
+    if (result.success) {
+
+      alert("Présence enregistrée ✅");
+
+    } else {
+
+      alert(result.message);
+    }
+
+  } catch (e) {
+
+    alert("Erreur réseau");
   }
+}
 
 </script>
 
