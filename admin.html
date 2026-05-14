@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Administration Présences</title>
+
+<style>
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
+
+.container {
+  max-width: 700px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.topbar {
+  margin-bottom: 20px;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.refresh-btn {
+  width: 100%;
+  background: #1f7aec;
+  color: white;
+}
+
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.effectif {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1f7aec;
+}
+
+.details {
+  margin-top: 15px;
+  display: none;
+}
+
+.personne {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.toggle-btn {
+  margin-top: 12px;
+  width: 100%;
+  background: #eeeeee;
+}
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  font-size: 18px;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+
+  0% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.5;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 25px;
+}
+
+.timestamp {
+  text-align: center;
+  color: #666;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+  <h1>
+    Administration des présences
+  </h1>
+
+  <div class="topbar">
+
+    <button
+      class="refresh-btn"
+      onclick="chargerAdmin()"
+    >
+      🔄 Rafraîchir
+    </button>
+
+  </div>
+
+  <div id="contenu">
+
+    <div class="loading">
+      ⏳ Chargement des présences...
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+const API_URL =
+  "TON_URL_APPS_SCRIPT";
+
+const contenu =
+  document.getElementById("contenu");
+
+chargerAdmin();
+
+async function chargerAdmin() {
+
+  contenu.innerHTML = `
+
+    <div class="loading">
+      ⏳ Chargement des présences...
+    </div>
+  `;
+
+  try {
+
+    const response = await fetch(
+      API_URL + "?admin=1"
+    );
+
+    const data = await response.json();
+
+    afficherDonnees(data);
+
+  } catch (e) {
+
+    contenu.innerHTML = `
+
+      <div class="card empty">
+
+        ❌ Erreur réseau
+
+      </div>
+    `;
+
+    console.error(e);
+  }
+}
+
+function afficherDonnees(data) {
+
+  if (!data || data.length === 0) {
+
+    contenu.innerHTML = `
+
+      <div class="card empty">
+
+        Aucun présent aujourd'hui
+
+      </div>
+    `;
+
+    return;
+  }
+
+  contenu.innerHTML = "";
+
+  data.forEach((seance, index) => {
+
+    const card =
+      document.createElement("div");
+
+    card.className = "card";
+
+    let inscritsHTML = "";
+
+    seance.inscrits.forEach(personne => {
+
+      inscritsHTML += `
+
+        <div class="personne">
+
+          ${personne.prenom}
+          ${personne.nom}
+
+        </div>
+      `;
+    });
+
+    card.innerHTML = `
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>
+            ${seance.seance}
+          </h2>
+
+        </div>
+
+        <div class="effectif">
+
+          ${seance.effectif}
+
+        </div>
+
+      </div>
+
+      <button
+        class="toggle-btn"
+        onclick="toggleDetails(${index})"
+      >
+        Voir les inscrits
+      </button>
+
+      <div
+        class="details"
+        id="details-${index}"
+      >
+
+        ${inscritsHTML}
+
+      </div>
+    `;
+
+    contenu.appendChild(card);
+  });
+
+  contenu.innerHTML += `
+
+    <div class="timestamp">
+
+      Dernière mise à jour :
+      ${new Date().toLocaleTimeString()}
+
+    </div>
+  `;
+}
+
+function toggleDetails(index) {
+
+  const div =
+    document.getElementById(
+      `details-${index}`
+    );
+
+  if (div.style.display === "block") {
+
+    div.style.display = "none";
+
+  } else {
+
+    div.style.display = "block";
+  }
+}
+
+setInterval(() => {
+
+  chargerAdmin();
+
+}, 30000);
+
+</script>
+
+</body>
+</html>
