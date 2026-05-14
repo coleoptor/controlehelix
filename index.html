@@ -262,21 +262,32 @@ function afficherSeances(data) {
     card.querySelector("button")
       .addEventListener("click", () => {
 
-        enregistrerPresence(seance);
+        enregistrerPresence(seance, button);
     });
 
     seancesDiv.appendChild(card);
   });
 }
 
-async function enregistrerPresence(seance) {
+async function enregistrerPresence(
+  seance,
+  button
+) {
+
+  button.disabled = true;
+
+  button.innerText =
+    "✅ Présence enregistrée";
+
+  button.style.background =
+    "#22c55e";
 
   const seanceTexte =
     `${seance.cours} - ${seance.heure}`;
 
   try {
 
-    const response = await fetch(API_URL, {
+    await fetch(API_URL, {
 
       method: "POST",
 
@@ -284,27 +295,21 @@ async function enregistrerPresence(seance) {
 
         nom: nom,
         prenom: prenom,
-        cours: seanceTexte
+        seance: seanceTexte
       })
     });
 
-    const result = await response.json();
-
-    if (result.success) {
-
-      alert("Présence enregistrée ✅");
-
-    } else {
-
-      alert(result.message);
-    }
-
   } catch (e) {
 
-    alert("Erreur réseau");
+    button.disabled = false;
+
+    button.innerText =
+      "❌ Erreur réseau";
+
+    button.style.background =
+      "#ef4444";
   }
 }
-
 </script>
 
 </body>
