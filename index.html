@@ -125,9 +125,20 @@ async function initialiser() {
 
     afficherBienvenue();
 
-    chargerDepuisCache();
+const cache = localStorage.getItem(
+  "club_planning_hebdo"
+);
 
-    chargerDepuisAPI();
+if(cache){
+
+  chargerDepuisCache();
+
+} else {
+
+  afficherChargement();
+}
+
+chargerDepuisAPI();
   }
 }
 
@@ -311,6 +322,23 @@ async function enregistrerPresence(
       "#ef4444";
   }
 }
+
+function afficherChargement() {
+
+  seancesDiv.innerHTML = `
+
+    <div class="card">
+
+      <h3>⏳ Chargement des séances...</h3>
+
+      <p>
+        Merci de patienter quelques secondes
+      </p>
+
+    </div>
+  `;
+}
+
 </script>
 
 </body>
