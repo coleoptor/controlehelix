@@ -259,11 +259,12 @@ function afficherSeances(data) {
       </button>
     `;
 
-    card.querySelector("button")
-      .addEventListener("click", () => {
+const button = card.querySelector("button");
 
-        enregistrerPresence(seance, button);
-    });
+button.addEventListener("click", () => {
+
+  enregistrerPresence(seance, button);
+});
 
     seancesDiv.appendChild(card);
   });
